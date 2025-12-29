@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  theta-guard:
+    build: .
+    container_name: theta-guard
+    ports:
+      - "8501:8501"
+    environment:
+      - TRADIER_TOKEN=${TRADIER_TOKEN}
+      - TRADIER_BASE=${TRADIER_BASE:-https://api.tradier.com/v1/}
+      - LIVE_MODE=${LIVE_MODE:-true}
+    volumes:
+      - ./theta_guard_weekly_journal.csv:/app/theta_guard_weekly_journal.csv
+    restart: unless-stopped
