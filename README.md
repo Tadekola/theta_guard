@@ -1,21 +1,42 @@
 # THETA-GUARD
 
-A modular quantitative options trading system for systematic weekly SPX Broken Wing Butterfly (BWB) strategy evaluation.
+A modular quantitative options **decision system** for evaluating a systematic weekly SPX Broken Wing Butterfly (BWB) strategy.
 
 ## Overview
 
-THETA-GUARD is a rule-based trading decision system that evaluates market conditions each week to determine whether to enter a defined-risk options spread. It emphasizes **capital preservation** over aggressive returns, using multiple gates and filters to block trades when conditions are unfavorable.
+THETA-GUARD is a rule-based trading decision engine that evaluates market conditions each week to determine whether a defined-risk options spread *should* be entered.  
+It prioritizes **capital preservation, discipline, and transparency** over aggressive returns.
 
-### Key Features
+The system is designed to **block trades by default** and only allow participation when multiple independent conditions align.
 
-- **Holiday Gate** - Automatically detects market holidays and shortened weeks
-- **EMA Engine** - Trend analysis using exponential moving averages
-- **Entry Evaluator** - Multi-factor decision logic with hard blocks and signal checks
-- **BWB Builder** - Constructs Broken Wing Butterfly spreads from option chains
-- **Slippage Model** - Simulates execution costs at various fill assumptions
-- **Risk Analysis** - Position sizing, gamma warnings, and max loss calculations
-- **Weekly Journal** - Automatic logging of all decisions for forward testing
-- **Streamlit Dashboard** - Visual interface for pipeline execution and monitoring
+> This project does **not** place trades automatically.  
+> All outputs are advisory and intended for manual execution.
+
+---
+
+## Key Features
+
+- **Holiday Gate** – Detects market holidays and shortened weeks
+- **EMA Engine** – Short-term trend regime analysis (3 EMA / 8 EMA)
+- **Entry Evaluator** – Hierarchical decision logic with hard blocks
+- **BWB Builder** – Constructs Broken Wing Butterfly spreads from live option chains
+- **Slippage Modeling** – Simulates realistic execution assumptions
+- **Risk Analysis** – Position sizing guidance and gamma danger-zone warnings
+- **Weekly Journal** – Append-only logging for forward testing and auditability
+- **Streamlit Dashboard** – Read-only UI for decision explanation and monitoring
+
+---
+
+## What This Project Is NOT
+
+- ❌ Not an auto-trading bot  
+- ❌ Not a signal prediction system  
+- ❌ Not a profit guarantee  
+- ❌ Not optimized for high-frequency trading  
+
+THETA-GUARD is intentionally conservative and slow by design.
+
+---
 
 ## Project Structure
 
@@ -26,93 +47,98 @@ theta_guard/
 │   ├── indicators/      # EMA and technical indicators
 │   ├── signals/         # Entry evaluation and confidence scoring
 │   ├── strategies/      # BWB structure building
-│   ├── execution/       # Slippage and quality checks
+│   ├── execution/       # Slippage and execution quality checks
 │   ├── risk/            # Position sizing and gamma warnings
 │   ├── journal/         # Weekly run logging
 │   ├── live/            # Paper trading with Tradier API
 │   └── run_week.py      # Main pipeline orchestrator
-├── streamlit_app.py     # Dashboard UI
+├── streamlit_app.py     # Streamlit dashboard
 ├── tests/               # Test suite
 └── pyproject.toml       # Dependencies
 ```
 
+---
+
 ## Installation
 
 ### Prerequisites
-
 - Python 3.11+
-- Poetry (recommended) or pip
+- Poetry (recommended)
 
 ### Setup
 
 ```bash
-# Clone the repository
 git clone https://github.com/yourusername/theta-guard.git
 cd theta-guard
-
-# Install dependencies with Poetry
 poetry install
-
-# Or with pip
-pip install -r requirements.txt
 ```
 
 ### Environment Configuration
 
-Create a `.env` file in `src/theta_guard/` with:
+Create a `.env` file in the project root:
 
 ```env
-# Tradier API (required for live data)
+# Tradier API (required for live market data)
 TRADIER_TOKEN=your_api_token
 TRADIER_BASE=https://api.tradier.com/v1/
 
-# Mode settings
+# Runtime mode
 LIVE_MODE=true
+REQUIRE_HUMAN_APPROVAL=true
 ```
+
+- `LIVE_MODE` enables live data access.
+- Trades remain paper / advisory only.
+
+---
 
 ## Usage
 
 ### Running the Dashboard
 
 ```bash
-streamlit run streamlit_app.py
+poetry run streamlit run streamlit_app.py
 ```
 
 The dashboard provides:
-- One-click pipeline execution
-- Real-time market data display
-- Trade/No-Trade decision with reasoning
-- BWB structure visualization
-- Slippage scenarios
-- Weekly journal history
+- Manual pipeline evaluation (one run at a time)
+- Trade / No-Trade decision with plain-English reasoning
+- Recommended BWB structure (if allowed)
+- Slippage-adjusted risk scenarios
+- Gamma / danger-zone awareness
+- Weekly decision history
 
-### Pipeline Flow
+### Typical Weekly Workflow
 
-1. **Environment Validation** - Checks API credentials and mode settings
-2. **Data Fetch** - Retrieves SPX prices and option chains from Tradier
-3. **Holiday Check** - Determines if the week is tradeable
-4. **EMA Analysis** - Computes trend state from price history
-5. **Entry Evaluation** - Applies all decision rules
-6. **Structure Building** - Constructs BWB if trade is allowed
-7. **Advisory Layers** - Adds slippage, gamma, and confidence analysis
-8. **Journaling** - Logs the decision for audit trail
+1. Open the dashboard near Monday market close
+2. Review the TRADE ALLOWED / NO TRADE decision
+3. If allowed, inspect risk and execution assumptions
+4. Optionally execute the trade manually in your broker
+5. Let the system journal the outcome automatically
+
+---
 
 ## Decision Logic
 
-The system uses a hierarchical decision process:
+THETA-GUARD uses a hierarchical decision process:
 
 ### Hard Blocks (Immediate NO TRADE)
-- Holiday week detected
-- Outside valid entry time window
-- API/environment failures
+- Market holiday or shortened week
+- Invalid environment or missing data
+- Outside permitted entry window
 
-### Signal Checks
-- EMA trend alignment
-- Volatility conditions
-- Macro event awareness
+### Signal Conditions
+- Short-term trend alignment (EMA regime)
 
-### Trade Allowed
-All gates must pass for a TRADE ALLOWED decision.
+### Advisory Context (Does NOT block trades)
+- Slippage assumptions
+- Gamma proximity warnings
+- Macro / event annotations
+- Confidence scoring
+
+Only when all required gates pass does the system return **TRADE ALLOWED**.
+
+---
 
 ## Disclaimer
 
@@ -120,9 +146,11 @@ All gates must pass for a TRADE ALLOWED decision.
 
 - Not financial advice
 - No guarantee of profits
-- Paper trading mode recommended
-- Always understand the risks of options trading
+- Options trading involves significant risk
+- Use paper trading and small size when testing
+
+---
 
 ## License
 
-MIT License - See LICENSE file for details.
+MIT License — see the [LICENSE](LICENSE) file for details.
