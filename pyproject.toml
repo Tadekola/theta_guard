@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "theta-guard"
+version = "0.1.0"
+description = "A modular quantitative trading system"
+authors = []
+readme = "README.md"
+packages = [{include = "theta_guard", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pandas-market-calendars = "^4.4.1"
+requests = "^2.31.0"
+streamlit = "^1.32.0"
+python-dotenv = "^1.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
